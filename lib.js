@@ -1,15 +1,21 @@
 /* internal modules */
-var fs = require('fs');
-var path = require('path');
-var WebSocket = require('ws');
+const fs = require('fs');
+const path = require('path');
+const WebSocket = require('ws');
+const mongodb = require('mongodb');
 
 /* external modules */
-var mime = require('mime');
+const mime = require('mime');
 
 /* own modules */
-var common = require('./common');
+const common = require('./common');
 
-var lib = module.exports = {
+/** @param {string} str */
+function escapeRegExp(str) {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const lib = module.exports = {
 
     sendErrorOnStaticContent: function (response, code) {
         console.log('>>> sending error ' + code + ' page');
@@ -119,5 +125,61 @@ var lib = module.exports = {
             }
             console.log('Sent to ' + n + ' from ' + nAll + ' sessions');
         } catch(ex) {}
+    },
+
+    searchUsers: async (_username) => {
+        const accounts = await common.accounts.aggregate([
+            {
+                $match: {
+                    username: new RegExp(`.*${escapeRegExp(_username)}.*`, 'i')
+                }
+            }, {
+                $limit: 64
+            }, {
+                $project: {
+                    _id: 1,
+                    username: 1
+                }
+            }
+        ]).toArray();
+        return accounts;
+    },
+
+    getFavorites: async (userId) => {
+        const favorites = await common.accounts.aggregate([
+            {
+                $match: {
+                    _id: userId
+                }
+            }, {
+                $unwind: {
+                    path: '$favorites',
+                    preserveNullAndEmptyArrays: false
+                }
+            }, {
+                $lookup: {
+                    from: 'accounts',
+                    localField: 'favorites',
+                    foreignField: '_id',
+                    as: 'favorite'
+                }
+            }, {
+                $unwind: '$favorite'
+            }, {
+                $project: {
+                    _id: 0,
+                    favorite: 1
+                }
+            }, {
+                $limit: 64
+            }
+        ]).toArray();
+        
+        return favorites.map(({favorite}) => {
+            return {
+                _id: favorite._id,
+                username: favorite.username
+            };
+        });
     }
 };

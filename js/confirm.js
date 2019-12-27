@@ -1,8 +1,8 @@
-var app = angular.module("app");
+// const app = angular.module("app");
 
 app.controller("Confirm", [ '$uibModalInstance', 'confirmOptions', function($uibModalInstance, confirmOptions) {
 
-    var ctrl = this;
+    const ctrl = this;
     ctrl.opt = confirmOptions;
 
     ctrl.ok = function () { $uibModalInstance.close(); };

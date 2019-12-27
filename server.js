@@ -1,23 +1,23 @@
 /* internal modules */
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
 
 /* external modules */
-var qs = require('query-string');
-var mongodb = require('mongodb');
-var cookies = require('cookies');
-var uuid = require('uuid');
-var WebSocket = require('ws');
+const qs = require('query-string');
+const mongodb = require('mongodb');
+const cookies = require('cookies');
+const uuid = require('uuid');
+const WebSocket = require('ws');
 
 /* own modules */
-var lib = require('./lib');
-var common = require('./common');
-var rest = require('./rest');
+const lib = require('./lib');
+const common = require('./common');
+const rest = require('./rest');
 
 /* configuration */
-var config = {};
+let config = {};
 try {
-    var content = fs.readFileSync('config.json');
+    const content = fs.readFileSync('config.json');
     config = JSON.parse(content);
 } catch(ex) {
     console.error(ex.message);
@@ -25,12 +25,12 @@ try {
 }
 
 /* HTTP server */
-var httpServer = http.createServer();
+const httpServer = http.createServer();
 
 httpServer.on('request', function (req, rep) {
-    var appCookies = new cookies(req, rep);
-    var session = appCookies.get('session');
-    var now = Date.now();
+    const appCookies = new cookies(req, rep);
+    let session = appCookies.get('session');
+    const now = Date.now();
     if(!session || !common.sessions[session]) {
         session = uuid();
         common.sessions[session] = { from: req.connection.remoteAddress, created: now, touched: now };
@@ -56,12 +56,9 @@ httpServer.on('request', function (req, rep) {
     }
 
     switch(parsedUrl.url) {
-
         /* static content server */
         case '/':
             lib.serveStaticContent(rep, 'html/index.html'); break;
-        case '/favicon.ico':
-            lib.serveStaticContent(rep, 'img/favicon.ico'); break;
         default:
             /* file server */
             if(/^\/(html|css|js|fonts|img)\//.test(parsedUrl.url)) {
@@ -80,7 +77,7 @@ common.ws.on('connection', function connection(conn) {
 	conn.on('message', function(data) {
         console.log('<<< retrieving data from websocket: ' + data);
         try {
-            var message = JSON.parse(data);
+            const message = JSON.parse(data);
             switch(message.action) {
                 case 'init':
                     if(message.session && common.sessions[message.session]) {
@@ -98,22 +95,33 @@ common.ws.on('connection', function connection(conn) {
 	}); 
 });
 
-/* main */
-
-/* uncomment below to handling uncaught exceptions */
-// process.on('uncaughtException', function(err) {
-//     console.error('Runtime error ' + err.code + ' in the function \'' + err.syscall + '\'');
-//     process.exit(1);
-// });
-
-mongodb.MongoClient.connect(config.db, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, conn) {
+mongodb.MongoClient.connect(config.db, { useNewUrlParser: true, useUnifiedTopology: true }, async (err, conn) =>
+{
     if(err) {
         console.error('Connection to ' + config.db + ' failed: ' + err.name);
         process.exit(2);
     }
-    var db = conn.db(config.dbName);
+    const db = conn.db(config.dbName);
     common.accounts = db.collection('accounts');
-    common.history = db.collection('history');
+    common.accounts.createIndex({username: 1}, {name: 'username', unique: true});
+
+    const exampleUsernames = ['2hotPersonal', 'Aislelyra', 'AlertChiri', 'Animelb', 'Aprilli', 'Articlem', 'Ategravi', 'Beambuxo', 'BlackSan', 'Borgelan', 'Brainymobi', 'Broadcate', 'BuddieVibrant', 'Bulgalt', 'BulletinRavager', 'Burnover', 'Captaine', 'Changs', 'ChanPsych', 'CookieStart', 'Cooperi', 'Crunchea', 'CuteBloom', 'CzarAngelic', 'Devexigat', 'Donaldeh', 'Eastner', 'Eatseu', 'Eugenestp', 'Facultr', 'Fulterom', 'FunnySimply', 'GatoHappy', 'GazetteWizard', 'Goodiati', 'Hartstli', 'HeavenEye', 'Hinchan', 'Hortoney', 'Hyposia', 'InformerBlab', 'InspiringThink', 'Jumpsiary', 'Kixon', 'Langdonic', 'Laxray', 'LuckyJide', 'Lummopo', 'Lyfert', 'Manshi', 'Mastersugg', 'Mclobb', 'Mellowne', 'Melneti', 'Mercybe', 'Minetp', 'Modesina', 'Mohawkeroo', 'Nayborld', 'Nofferis', 'NotJim', 'Nozymeds', 'Patrmer', 'Ploughlog', 'PodPeatear', 'Proladelc', 'Publivv', 'Rapti', 'Reneurop', 'Repleon', 'Roachetta', 'Sandhew', 'Scensink', 'ScorpionBigg', 'SharkWin', 'Signerer', 'SlayerRay', 'SlayStory', 'Spection', 'Stargaltica', 'Stewarm', 'Succent', 'Suppindo', 'Synchroni', 'Tabst', 'Talendla', 'Talenterc', 'Telarics', 'Tenthwarc', 'Theborgista', 'Thesoyones', 'Thinkwo', 'TrippinDj', 'Valanelvi', 'Wasabi2cool', 'Wercadab', 'Whiternet', 'Withanics', 'Wondeller', 'WubbaPapa'];
+
+    if(100 > await common.accounts.countDocuments()) {
+        console.log('Generating example accounts');
+
+        await Promise.all(new Array(100).fill(0).map(() => {
+            const exampleAccount = {
+                email: `${uuid().substr(0, 10)}@example.com`,
+                username: `${
+                    exampleUsernames[(Math.random()*exampleUsernames.length)|0]
+                }${(Math.random()*100)|0}`,
+                password: '1234'
+            };
+            return common.accounts.insertOne(exampleAccount);
+        })).catch(console.error);
+    }
+
     console.log('Connection with ' + config.db + ' established');
     httpServer.listen(config.port);
     console.log("HTTP server is listening on the port " + config.port);

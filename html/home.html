@@ -1,2 +1,103 @@
-<h3>Strona główna</h3>
-Programowanie Aplikacji Internetowych 2019
+<main class="home-layout" ng-controller="Home as ctrl">
+    <aside>
+        <section class="favorites" style="border-bottom: 1px solid #fff3; padding-bottom: 8px;">
+            <label>Ulubione</label>
+            <div class="favorites-container">
+                <div ng-repeat="(key, value) in ctrl.favorites">
+                    <button ng-class="ctrl.isChatOpen(value) ? 'active' : ''" class="openChatBtn" ng-click="ctrl.openChat(value)">
+                        <i class="fa fa-comment"></i> {{value.username}}
+                    </button>
+                    <span ng-click="ctrl.deleteFavorite(key)" class="fa fa-times delete-btn" style="margin: 0 8px;"></span>
+                </div>
+            </div>
+        </section>
+        <section class="search-user">
+            <div style="padding: 0 8px">
+                <label>Wyszukiwarka</label>
+                <input class="form-control" type="test" placeholder="Wpisz nazwę" ng-model="ctrl.searchUsername" />
+                <button class="btn fa fa-search" style="margin: 8px 0;" type="submit" ng-click="ctrl.searchUsers()" ng-disabled="!ctrl.searchUsername">
+                    <span style="margin-left: 4px">Szukaj</span>
+                </button>
+                <div ng-if="ctrl.searching">Trwa wyszukiwanie...</div>
+            </div>
+            <div class="users-container">
+                <div ng-if="!ctrl.searching" class="users">
+                    <div ng-repeat="(key, value) in ctrl.foundUsers">
+                        <button ng-class="ctrl.isChatOpen(value) ? 'active' : ''" class="openChatBtn" ng-click="ctrl.openChat(value)">
+                            <i class="fa fa-comment"></i> {{value.username}}
+                        </button>
+                        <span ng-if="ctrl.canBeFavorite(value)" ng-click="ctrl.addFavorite(value)" class="fa fa-star favorite-btn" style="margin: 0 8px;"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </aside>
+    <div class="chat-windows">
+        <div ng-repeat="(key, value) in ctrl.openChats">
+            <h4>
+                {{value.user.username}} 
+                <button ng-click="ctrl.closeChat(value)" class="closer clean fa fa-close"></button>
+            </h4>
+            <div class="messages-container">
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+                <div>Przykładowa wiadomość</div>
+            </div>
+            <div style="display: flex; justify-content: stretch; box-shadow: 0px 0px 4px #0004;">
+                <input type='text' placeholder="Wpisz wiadomość" style="flex-grow: 3;"/>
+                <button class="btn btn-light fa fa-caret-right"></button>
+            </div>
+        </div>
+    </div>
+</main>

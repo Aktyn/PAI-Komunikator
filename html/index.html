@@ -1,78 +1,57 @@
 <!DOCTYPE html>
 <html ng-app="app">
-
-<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <title>PAI2019</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/font-awesome.min.css">
-	<link rel="stylesheet" href="/css/nv.d3.min.css">
-    <link rel="stylesheet" href="/css/index.css">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-</head>
-    
-<body class="workarea">
-    
-    <div class="container">
-
-		<div ng-controller="Menu as ctrl">
-
-			<div uib-alert class="alert-animated" ng-class="ctrl.alert.type" close="ctrl.closeAlert()" dismiss-on-timeout="3000" ng-if="ctrl.alert.text">
-				{{ctrl.alert.text}}
-			</div>
-
-			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-				<div class="container-fluid">
-
-					<div class="navbar-header">
-
-						<button type="button" class="navbar-toggle" ng-click="ctrl.isCollapsed = !ctrl.isCollapsed">
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-
-					</div>
-
-					<div class="navbar-collapse" ng-class="ctrl.isCollapsed ? 'collapse' : 'in'">
-
-						<ul class="nav navbar-nav">
-							<li ng-repeat="menuPos in ctrl.menu" ng-class="ctrl.navClass(menuPos.route)">
-								<a href="#{{menuPos.route}}" ng-bind-html="menuPos.title"></a>
-							</li>
-						</ul>
-
-						<ul class="nav navbar-nav navbar-right">
-							<li><a ng-bind-html="ctrl.loginIcon()" ng-click="ctrl.login()"></a></li>
-						</ul>
-
-					</div>
+	<head>
+		<meta charset="utf-8">
+		<title>PAI - Komunikator</title>
+		<link rel="icon" href="/img/icon.png">
+		<link rel="stylesheet" href="/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/css/font-awesome.min.css">
+		<link rel="stylesheet" href="/css/nv.d3.min.css">
+		<link rel="stylesheet" href="/css/index.css">
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+	</head>
+	<body class="workarea">
+		<div class="main-layout" ng-controller="Menu as ctrl">
+			<div>
+				<div uib-alert class="alert-animated" ng-class="ctrl.alert.type" close="ctrl.closeAlert()" dismiss-on-timeout="3000" ng-if="ctrl.alert.text">
+					{{ctrl.alert.text}}
 				</div>
-			</nav>
+				<nav class="navigation" role="navigation">
+					<div style="display: flex; flex-direction: row; align-items: center;">
+						<img ng-click="ctrl.authorInfo = !ctrl.authorInfo" src="/img/icon.png" style="max-height: 48px;" />
+						<div ng-if="ctrl.authorInfo" style="margin-left: 8px;">Radosław Krajewski (<a href="https://github.com/Aktyn" style="text-decoration: none;color: #80CBC4;" target="_blank">Aktyn</a>)</div>
+					</div>
+					<button ng-if="!ctrl.username" ng-click="ctrl.login()">
+						<span class="fa fa-sign-in" style="margin-right: 8px;"></span>
+						Zaloguj
+					</button>
+					<button ng-if="ctrl.username" ng-click="ctrl.login()">
+						<span class="fa fa-user" style="margin-right: 8px;"></span>
+						{{ctrl.username}}
+					</button>
+				</nav>
+			</div>
+			<div ng-if="!ctrl.username">
+				<button class="initial-info" ng-click="ctrl.login()">Zaloguj się aby skorzystać z czatu</button>
+			</div>
+			<div ng-if="ctrl.username" ng-view></div>
 		</div>
 
-        <div ng-view></div>
+		<script src="/js/angular.min.js"></script>
+		<script src="/js/ui-bootstrap-tpls.min.js"></script>
+		<script src="/js/angular-sanitize.min.js"></script>
+		<script src="/js/angular-route.min.js"></script>
+		<script src="/js/angular-animate.min.js"></script>
+		<script src="/js/angular-websocket.min.js"></script>
+		<script src="/js/ui-bootstrap-tpls.min.js"></script>
+		<script src="/js/d3.min.js"></script>
+		<script src="/js/nv.d3.min.js"></script>
+		<script src="/js/angular-nvd3.min.js"></script>
 
-        </div>
-	</div>
-    
-<script src="/js/angular.min.js"></script>
-<script src="/js/ui-bootstrap-tpls.min.js"></script>
-<script src="/js/angular-sanitize.min.js"></script>
-<script src="/js/angular-route.min.js"></script>
-<script src="/js/angular-animate.min.js"></script>
-<script src="/js/angular-websocket.min.js"></script>
-<script src="/js/ui-bootstrap-tpls.min.js"></script>
-<script src="/js/d3.min.js"></script>
-<script src="/js/nv.d3.min.js"></script>
-<script src="/js/angular-nvd3.min.js"></script>
-
-<script src="/js/app.js"></script>
-<script src="/js/confirm.js"></script>
-<script src="/js/home.js"></script>
-<script src="/js/transfer.js"></script>
-<script src="/js/history.js"></script>
-<script src="/js/trend.js"></script>
-
-</body></html>
+		<script src="/js/app.js"></script>
+		<script src="/js/confirm.js"></script>
+		<script src="/js/chat.js"></script>
+		<script src="/js/home.js"></script>
+	</body>
+</html>

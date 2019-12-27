@@ -1,0 +1,88 @@
+.favorites-container {
+    max-height: 30vh;
+    overflow-y: auto;
+  }
+  
+  .search-user {
+    text-align: center;
+    display: grid;
+    grid-template-rows: fit-content(100%) auto;
+  }
+  
+  .favorites > label, .search-user > div > label {
+    display: block;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px 0;
+  }
+  
+  .search-user button {
+    color: #263238;
+    outline: none;
+  }
+  
+  .users-container {
+    position: relative;
+    align-self: stretch;
+  }
+  
+  .users {
+    text-align: left;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    max-height: 100%;
+    width: 100%;
+    overflow-y: auto;
+  }
+  
+  .users > *, .favorites-container > * {
+    padding: 4px 4px;
+    display: grid;
+    grid-template-columns: auto fit-content(100%);
+    justify-content: space-between;
+  }
+  
+  .users .favorite-btn {
+    cursor: pointer;
+  }
+  
+  .users .favorite-btn:hover {
+    color: #FFC107;
+  }
+  
+  .users > *:not(:last-child), .favorites-container > *:not(:last-child) {
+    border-bottom: 1px solid #fff2;
+  }
+  
+  .favorites-container .delete-btn {
+    cursor: pointer;
+  }
+  
+  .favorites-container .delete-btn:hover {
+    color: #e57373;
+  }
+  
+  .openChatBtn {
+    background-color: #fff0;
+    border: none;
+    color: #fff !important;
+    padding: 2px 12px;
+    border-radius: 24px;
+    transition: background-color 0.175s ease-in-out;
+    display: flex;
+    align-items: center;
+  }
+
+  .openChatBtn.active {
+      cursor: auto;
+      color: #A5D6A7 !important;
+  }
+  
+  .openChatBtn > i {
+    margin-right: 8px;
+  }
+  
+  .openChatBtn:not(.active):hover {
+    background-color: #fff4;
+  }

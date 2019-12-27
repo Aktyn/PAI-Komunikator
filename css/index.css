@@ -1,5 +1,20 @@
+@import "scrollbars.css";
+@import "modal.css";
+@import "users.css";
+@import "chat.css";
+
 body {
-  margin-top: 4em;
+  background-color: #607D8B;
+  color: #ECEFF1;
+}
+
+button {
+  outline: none;
+}
+
+button.clean {
+  background-color: transparent;
+  border: none;
 }
 
 .alert-animated {
@@ -37,3 +52,78 @@ body {
 
 .bg-green { background-color: #EEFFEE; }
 .bg-red { background-color: #FFEEEE; }
+
+.navigation {
+  background-color: #263238;
+  box-shadow: 0px 2px 5px #0008;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.navigation button {
+  background-color: #455A64;
+  border: none;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  border-radius: 100px;
+  box-shadow: 0px 2px 5px #0006;
+
+  transition: background-color 0.2s ease-in-out;
+}
+
+.navigation button:hover {
+  background-color: #546E7A;
+}
+
+.navigation button:active {
+  background-color: #607D8B;
+}
+
+.navigation .fa {
+  font-size: 1.4em;
+  color: #fff;
+  opacity: 0.5;
+}
+
+.initial-info {
+  font-size: 28px;
+  display: block;
+  padding: 32px;
+  margin: auto;
+  background-color: transparent;
+  border: none;
+  width: fit-content;
+  height: auto;
+
+  opacity: 0.66;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.initial-info:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.main-layout {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
+}
+
+.home-layout {
+  display: grid;
+  grid-template-columns: fit-content(100%) auto;
+  justify-content: stretch;
+  height: 100%;
+  align-items: stretch;
+}
+
+.home-layout > aside {
+  border-right: 1px solid #fff3;
+  width: 250px;
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
+}

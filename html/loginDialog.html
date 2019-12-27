@@ -1,20 +1,38 @@
 <form name="loginForm">
-
-    <div class="modal-header">
+    <div ng-if="!ctrl.registerView" class="modal-header-ex">
         <h3 class="modal-title" id="modal-title">Logowanie</h3>
+        <button class="register-btn" ng-click="ctrl.toggleRegisterView(true)">
+            <span class="fa fa-plus" style="margin-right: 8px;"></span>
+            Zarejestruj konto
+        </button>
+    </div>
+    <div ng-if="ctrl.registerView" class="modal-header-ex">
+        <h3 class="modal-title" id="modal-title">Rejestracja konta</h3>
+        <button class="register-btn" ng-click="ctrl.toggleRegisterView(false)">
+            <span class="fa fa-close" style="margin-right: 8px;"></span>
+            Wróć do logowania
+        </button>
     </div>
 
     <div class="modal-body" id="modal-body">
-        <label for="email">Email</label>
-        <input id="email" type="text" class="form-control" ng-model="ctrl.creds.email" required="true" ng-change="ctrl.loginError = false;"/>
+        <span ng-if="ctrl.registerView">
+            <label for="username">Email</label>
+            <input id="email" type="text" class="form-control" ng-model="ctrl.creds.email" required="true" ng-change="ctrl.loginError = null;"/>
+        </span>
+        <label for="username">Nazwa użytkownika</label>
+        <input id="username" type="text" class="form-control" ng-model="ctrl.creds.username" required="true" ng-change="ctrl.loginError = null;"/>
         <label for="password">Hasło</label>
-        <input id="password" type="password" class="form-control" ng-model="ctrl.creds.password" ng-change="ctrl.loginError = false;"/>
+        <input id="password" type="password" class="form-control" ng-model="ctrl.creds.password" ng-change="ctrl.loginError = null;"/>
     </div>
 
     <div class="modal-footer">
-        <span style="float: left;" class="label label-warning" ng-if="ctrl.loginError">Niepoprawny email lub hasło</span>
-        <button class="btn btn-success fa fa-sign-in" type="submit" ng-disabled="loginForm.$invalid" ng-click="ctrl.tryLogin()"></button>
+        <span style="float: left;" class="label label-warning" ng-if="ctrl.loginError">{{ctrl.loginError}}</span>
+        <button class="btn btn-success fa fa-sign-in" type="submit" ng-disabled="loginForm.$invalid" ng-click="ctrl.tryLogin()" ng-if="!ctrl.registerView">
+            <span style="margin-left: 4px">Zaloguj</span>
+        </button>
+        <button class="btn btn-success fa fa-sign-in" type="submit" ng-disabled="loginForm.$invalid" ng-click="ctrl.tryRegister()" ng-if="ctrl.registerView">
+            <span style="margin-left: 4px">Zarejestruj</span>
+        </button>
         <button class="btn btn-danger fa fa-times" type="button" ng-click="ctrl.cancel()"></button>
     </div>
-
 </form>

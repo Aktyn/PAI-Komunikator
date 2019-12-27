@@ -1,41 +1,55 @@
-var app = angular.module("app", ['ngSanitize', 'ngRoute', 'ngAnimate', 'ngWebSocket', 'ui.bootstrap', 'nvd3']);
+const app = angular.module("app", ['ngSanitize', 'ngRoute', 'ngAnimate', 'ngWebSocket', 'ui.bootstrap', 'nvd3']);
 
 // zmienne globalne
 app.value('globals', {
-    email: ''
+    email: null,
+    username: null
 });
 
 // nowe podstrony i ich kontrolery
 app.constant('routes', [
-	{ route: '/', templateUrl: '/html/home.html', controller: 'Home', controllerAs: 'ctrl', menu: '<i class="fa fa-lg fa-home"></i>', guest: true },
-	{ route: '/transfer', templateUrl: '/html/transfer.html', controller: 'Transfer', controllerAs: 'ctrl', menu: 'Przelew' },
-    { route: '/history', templateUrl: '/html/history.html', controller: 'History', controllerAs: 'ctrl', menu: 'Historia' },
-    { route: '/trend', templateUrl: '/html/trend.html', controller: 'Trend', controllerAs: 'ctrl', menu: 'Trend' }    
+	{ route: '/', templateUrl: '/html/home.html', controller: 'Home', controllerAs: 'ctrl', guest: true } 
 ]);
 
 app.config(['$routeProvider', '$locationProvider', 'routes', function($routeProvider, $locationProvider, routes) {
     $locationProvider.hashPrefix('');
-	for(var i in routes) {
+	for(const i in routes) {
 		$routeProvider.when(routes[i].route, routes[i]);
 	}
 	$routeProvider.otherwise({ redirectTo: '/' });
 }]);
 
 app.controller("loginDialog", [ '$http', '$uibModalInstance', function($http, $uibModalInstance) {
-    var ctrl = this;
+    const ctrl = this;
     // devel: dla szybszego logowania
-    ctrl.creds = { email: 'jim@beam.com', password: 'admin1' };
-    ctrl.loginError = false;
+    ctrl.creds = { email: 'example@email.com', password: '12345', username: 'Aktyn' };
+    ctrl.loginError = null;
 
-    ctrl.tryLogin = function() {
-        $http.post('/login', ctrl.creds).then(
-            function(rep) {
-                $uibModalInstance.close(rep.data.email);
-            },
-            function(err) {
-                ctrl.loginError = true;
-            }
-        );
+    ctrl.registerView = false;
+    ctrl.toggleRegisterView = show => ctrl.registerView = show;
+
+    function handleLogin(email, username) {
+        $uibModalInstance.close({email, username});
+    }
+
+    ctrl.tryRegister = () => {
+        $http.post('/register', ctrl.creds).then(rep => {
+            handleLogin(rep.data.email, rep.data.username);
+            ctrl.registerView = false;
+        }, err => {
+            if(err.data.error === 'Account already exists')
+                ctrl.loginError = 'Takie konto już istnieje';
+            else
+                ctrl.loginError = 'Wystąpił błąd podczas rejestracji konta';
+        });
+    };
+
+    ctrl.tryLogin = () => {
+        $http.post('/login', ctrl.creds).then(rep => {
+            handleLogin(rep.data.email, rep.data.username);
+        }, err => {
+            ctrl.loginError = 'Niepoprawny email lub hasło';
+        });
     };
 
     ctrl.cancel = function() {
@@ -46,44 +60,40 @@ app.controller("loginDialog", [ '$http', '$uibModalInstance', function($http, $u
 
 app.controller('Menu', ['$http', '$rootScope', '$scope', '$location', '$uibModal', '$websocket', 'routes', 'globals', 'common',
 	function($http, $rootScope, $scope, $location, $uibModal, $websocket, routes, globals, common) {
-        var ctrl = this;
-
+        const ctrl = this;
+        
+        ctrl.username = null;
         ctrl.alert = common.alert;
-        ctrl.menu = [];
 
-        var refreshMenu = function() {
-            ctrl.menu = [];
-            for (var i in routes) {
-                if(routes[i].guest || globals.email) {
-                    ctrl.menu.push({route: routes[i].route, title: routes[i].menu});
-                }
-            }
+        const refresh = function() {
+            ctrl.username = globals.username;
         };
 
-        $http.get('/login').then(
-            function(rep) { 
-                globals.email = rep.data.email;
-                refreshMenu();
+        $http.get('/login').then(rep => {
+            globals.email = rep.data.email;
+            globals.username = rep.data.username;
+            refresh();
 
-                try {
-                    var dataStream = $websocket('ws://' + window.location.host);
-                    dataStream.onMessage(function(rep) {
-                        try {
-                            var message = JSON.parse(rep.data);
-                            for(var topic in message) {
-                                $rootScope.$broadcast(topic, message[topic]);
-                            }
-                        } catch(ex) {
-                            console.error('Data from websocket cannot be parsed: ' + rep.data);
+            try {
+                const dataStream = $websocket('ws://' + window.location.host);
+                dataStream.onMessage(function(rep) {
+                    try {
+                        const message = JSON.parse(rep.data);
+                        for(let topic in message) {
+                            $rootScope.$broadcast(topic, message[topic]);
                         }
-                    });
-                    dataStream.send(JSON.stringify({action: 'init', session: rep.data.session}));
-                } catch(ex) {
-                    console.error('Initialization of websocket communication failed');
-                }
-            },
-            function(err) { globals.email = null; }
-        );
+                    } catch(error) {
+                        console.error('Data from websocket cannot be parsed: ' + rep.data);
+                    }
+                });
+                dataStream.send(JSON.stringify({action: 'init', session: rep.data.session}));
+            } catch(error) {
+                console.error('Initialization of websocket communication failed');
+            }
+        }, err => { 
+            globals.email = null; 
+            globals.username = null;
+        });
 
         ctrl.isCollapsed = true;
 
@@ -95,26 +105,19 @@ app.controller('Menu', ['$http', '$rootScope', '$scope', '$location', '$uibModal
 			return page === $location.path() ? 'active' : '';
 		}
 
-		ctrl.loginIcon = function() {
-			return globals.email ? globals.email + '&nbsp;<span class="fa fa-lg fa-sign-out"></span>' : '<span class="fa fa-lg fa-sign-in"></span>';
-		}
-
         ctrl.login = function() {
-            if(globals.email) {
-                common.confirm({ title: 'Koniec pracy?', body: 'Chcesz wylogować ' + globals.email + '?' }, function(answer) {
+            if(globals.email && globals.username) {//if user is logged in
+                common.confirm({ title: `Witaj ${globals.username}`, body: 'Czy na pewno chcesz się wylogować?' }, function(answer) {
                     if(answer) {    
-                        $http.delete('/login').then(
-                            function(rep) {
-                                globals.email = null;
-                                refreshMenu();
-                                $location.path('/');
-                            },
-                            function(err) {}
-                        );
+                        $http.delete('/login').then(rep => {
+                            globals.email = globals.username = null;
+                            refresh();
+                            $location.path('/');
+                        }, err => {});
                     }
                 });    
             } else {
-                var modalInstance = $uibModal.open({
+                const modalInstance = $uibModal.open({
                     animation: true,
                     ariaLabelledBy: 'modal-title-top',
                     ariaDescribedBy: 'modal-body-top',
@@ -124,11 +127,13 @@ app.controller('Menu', ['$http', '$rootScope', '$scope', '$location', '$uibModal
                 });
                 modalInstance.result.then(
                     function(data) {
-                        globals.email = data;
-                        refreshMenu();
+                        globals.email = data.email;
+                        globals.username = data.username;
+                        refresh();
                         $location.path('/');
                     });
-            }};
+            }
+        };
 
         ctrl.closeAlert = function() { ctrl.alert.text = ""; };
 }]);
@@ -138,11 +143,9 @@ app.controller('Menu', ['$http', '$rootScope', '$scope', '$location', '$uibModal
     common.showMessage( message )
     common.showError( message )
 */
-app.service('common', [ '$uibModal', 'globals', function($uibModal, globals) {
-
+app.service('common', ['$uibModal', 'globals', function($uibModal, globals) {
     this.confirm = function(confirmOptions, callback) {
-
-        var modalInstance = $uibModal.open({
+        const modalInstance = $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title-top',
             ariaDescribedBy: 'modal-body-top',
@@ -177,5 +180,4 @@ app.service('common', [ '$uibModal', 'globals', function($uibModal, globals) {
     this.stamp2date = function(stamp) {
         return new Date(stamp).toLocaleString();
     };
-    
 }]);

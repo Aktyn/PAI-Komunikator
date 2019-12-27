@@ -1,0 +1,68 @@
+.chat-windows {
+    display: flex;
+    /* justify-content: space-evenly; */
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: auto;
+    perspective: 1024px;
+}
+
+.chat-windows > * {
+    display: inline-grid;
+    grid-template-rows: fit-content(100%) auto fit-content(100%);
+    align-items: stretch;
+    width: 405px;
+    min-width: 405px;
+    /* height: calc(100% - 48px); */
+    max-height: 655px;
+    margin: 24px;
+    border-radius: 8px;
+    background-color: #CFD8DC;/*#78909C;*/
+    color: #455A64;
+    box-shadow: 0px 3px 6px #0004;
+    overflow: hidden;
+
+    animation: pop-in 0.5s ease-in-out forwards;
+}
+
+.chat-windows > * > h4 {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    margin: 0;
+    border-bottom: 1px solid #0002;
+}
+
+.chat-windows .closer:hover {
+    color: #e57373;
+}
+
+@keyframes pop-in {
+    0% {
+        opacity: 0;
+        transform: rotateX(30deg);
+    }
+    100% {
+        opacity: 1;
+        transform: rotateX(0deg);
+    }
+}
+
+.chat-windows input {
+    border: none;
+    outline: none;
+    background-color: #CFD8DC;
+    padding: 0 8px;
+}
+
+.chat-windows .messages-container {
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 0 8px;
+}
+
+.chat-windows .messages-container > * {
+
+}
