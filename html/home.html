@@ -32,71 +32,38 @@
             </div>
         </section>
     </aside>
-    <div class="chat-windows">
-        <div ng-repeat="(key, value) in ctrl.openChats">
-            <h4>
-                {{value.user.username}} 
-                <button ng-click="ctrl.closeChat(value)" class="closer clean fa fa-close"></button>
-            </h4>
-            <div class="messages-container">
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-                <div>Przykładowa wiadomość</div>
-            </div>
-            <div style="display: flex; justify-content: stretch; box-shadow: 0px 0px 4px #0004;">
-                <input type='text' placeholder="Wpisz wiadomość" style="flex-grow: 3;"/>
-                <button class="btn btn-light fa fa-caret-right"></button>
+    <div>
+        <div class="notifications" ng-if="ctrl.notifications.length > 0">
+            <span 
+                ng-repeat="(key_notification, notification) in ctrl.notifications"
+                ng-click="ctrl.openNotification(notification)"
+            >
+                {{notification.content}}
+            </span>
+        </div>
+        <div class="chat-windows">
+            <div ng-repeat="(key_chat, chat) in ctrl.openChats">
+                <h4>
+                    {{chat.user.username}} 
+                    <button ng-click="ctrl.closeChat(chat)" class="closer clean fa fa-close"></button>
+                </h4>
+                <div class="messages-container" id="chat_{{chat.id}}" onscroll="onMessagesContainerScroll(event)" ng-click="chat.focusInput()">
+                    <div ng-repeat="(key_msg, msg) in chat.messages" 
+                        ng-class="msg.leftSide ? 'right' : ''"
+                    >
+                        <label>
+                            <span>{{msg.from}}</span>
+                            <span>({{msg.time}})</span>
+                        </label>
+                        <div>
+                            <div ng-repeat="(key_content, content) in msg.content track by $index">{{content}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: stretch; box-shadow: 0px 0px 4px #0004;">
+                    <input id="chat_input_{{chat.id}}" type='text' placeholder="Wpisz wiadomość" ng-model="chat.inputMsg" style="flex-grow: 3;" ng-keydown="chat.onKeyDown($event)" />
+                    <button ng-click="chat.sendMessage()" class="btn btn-light fa fa-caret-right"></button>
+                </div>
             </div>
         </div>
     </div>

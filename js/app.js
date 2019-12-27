@@ -76,12 +76,9 @@ app.controller('Menu', ['$http', '$rootScope', '$scope', '$location', '$uibModal
 
             try {
                 const dataStream = $websocket('ws://' + window.location.host);
-                dataStream.onMessage(function(rep) {
+                dataStream.onMessage(rep => {
                     try {
-                        const message = JSON.parse(rep.data);
-                        for(let topic in message) {
-                            $rootScope.$broadcast(topic, message[topic]);
-                        }
+                        $rootScope.$broadcast('chatMessage', rep.data);
                     } catch(error) {
                         console.error('Data from websocket cannot be parsed: ' + rep.data);
                     }
@@ -138,11 +135,6 @@ app.controller('Menu', ['$http', '$rootScope', '$scope', '$location', '$uibModal
         ctrl.closeAlert = function() { ctrl.alert.text = ""; };
 }]);
 
-/*
-    common.confirm( { title: title, body: body, noOk: false, noCancel: false } , function(answer) { ... } )
-    common.showMessage( message )
-    common.showError( message )
-*/
 app.service('common', ['$uibModal', 'globals', function($uibModal, globals) {
     this.confirm = function(confirmOptions, callback) {
         const modalInstance = $uibModal.open({

@@ -42,7 +42,7 @@ httpServer.on('request', function (req, rep) {
 
     console.log('<<< ' + req.method + ' ' + req.url + ' [' + session + ']');
 
-    var parsedUrl = qs.parseUrl(req.url);
+    const parsedUrl = qs.parseUrl(req.url);
     if(req.method == 'POST' || req.method == 'PUT') {
         /* requests with payload will be redirected to rest */
         lib.payload2JSON(req, rep, function(req, rep, payload, err) {
@@ -102,8 +102,11 @@ mongodb.MongoClient.connect(config.db, { useNewUrlParser: true, useUnifiedTopolo
         process.exit(2);
     }
     const db = conn.db(config.dbName);
+
     common.accounts = db.collection('accounts');
     common.accounts.createIndex({username: 1}, {name: 'username', unique: true});
+
+    common.messages = db.collection('messages');
 
     const exampleUsernames = ['2hotPersonal', 'Aislelyra', 'AlertChiri', 'Animelb', 'Aprilli', 'Articlem', 'Ategravi', 'Beambuxo', 'BlackSan', 'Borgelan', 'Brainymobi', 'Broadcate', 'BuddieVibrant', 'Bulgalt', 'BulletinRavager', 'Burnover', 'Captaine', 'Changs', 'ChanPsych', 'CookieStart', 'Cooperi', 'Crunchea', 'CuteBloom', 'CzarAngelic', 'Devexigat', 'Donaldeh', 'Eastner', 'Eatseu', 'Eugenestp', 'Facultr', 'Fulterom', 'FunnySimply', 'GatoHappy', 'GazetteWizard', 'Goodiati', 'Hartstli', 'HeavenEye', 'Hinchan', 'Hortoney', 'Hyposia', 'InformerBlab', 'InspiringThink', 'Jumpsiary', 'Kixon', 'Langdonic', 'Laxray', 'LuckyJide', 'Lummopo', 'Lyfert', 'Manshi', 'Mastersugg', 'Mclobb', 'Mellowne', 'Melneti', 'Mercybe', 'Minetp', 'Modesina', 'Mohawkeroo', 'Nayborld', 'Nofferis', 'NotJim', 'Nozymeds', 'Patrmer', 'Ploughlog', 'PodPeatear', 'Proladelc', 'Publivv', 'Rapti', 'Reneurop', 'Repleon', 'Roachetta', 'Sandhew', 'Scensink', 'ScorpionBigg', 'SharkWin', 'Signerer', 'SlayerRay', 'SlayStory', 'Spection', 'Stargaltica', 'Stewarm', 'Succent', 'Suppindo', 'Synchroni', 'Tabst', 'Talendla', 'Talenterc', 'Telarics', 'Tenthwarc', 'Theborgista', 'Thesoyones', 'Thinkwo', 'TrippinDj', 'Valanelvi', 'Wasabi2cool', 'Wercadab', 'Whiternet', 'Withanics', 'Wondeller', 'WubbaPapa'];
 

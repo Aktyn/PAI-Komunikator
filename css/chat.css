@@ -1,3 +1,26 @@
+.notifications {
+    padding: 16px;
+    text-align: center;
+}
+
+.notifications > * {
+    display: inline-block;
+    background-color: #F06292;
+    box-shadow: 0px 4px #EC407A;
+    border-radius: 32px;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 0px 0px 1px #880E4F;
+    padding: 8px 16px;
+    cursor: pointer;
+    animation: pop-in 0.5s ease-in-out forwards;
+}
+
+.notifications > *:hover {
+    background-color: #F48FB1;
+    box-shadow: 0px 4px #F06292;
+}
+
 .chat-windows {
     display: flex;
     /* justify-content: space-evenly; */
@@ -13,11 +36,11 @@
     align-items: stretch;
     width: 405px;
     min-width: 405px;
-    /* height: calc(100% - 48px); */
+    min-height: 405px;
     max-height: 655px;
     margin: 24px;
     border-radius: 8px;
-    background-color: #CFD8DC;/*#78909C;*/
+    background-color: #CFD8DC;
     color: #455A64;
     box-shadow: 0px 3px 6px #0004;
     overflow: hidden;
@@ -64,5 +87,19 @@
 }
 
 .chat-windows .messages-container > * {
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
 
+.chat-windows .messages-container > :not(:last-child) {
+    border-bottom: 1px solid #0001;
+}
+
+.chat-windows .messages-container > :not(.right) {
+    text-align: right;
+}
+
+.chat-windows .messages-container label {
+    font-size: 11px;
+    color: #78909C;
 }

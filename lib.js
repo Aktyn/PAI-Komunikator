@@ -100,7 +100,7 @@ const lib = module.exports = {
     sendDataToSession: function(session, data) {
         try {
             console.log('Attempting to send data ' + data + ' to session ' + session);
-            var n = 0, nAll = 0;
+            let n = 0, nAll = 0;
             common.ws.clients.forEach(function(client) {
                 nAll++;
                 if(client.session == session && client.readyState === WebSocket.OPEN) {
@@ -115,7 +115,7 @@ const lib = module.exports = {
     sendDataToAccount: function(_id, data) {
         try {
             console.log('Attempting to send data ' + data + ' to user ' + _id);
-            var n = 0, nAll = 0;
+            let n = 0, nAll = 0;
             for(var session in common.sessions) {
                 nAll++;
                 if(_id.equals(common.sessions[session].accountNo) && common.sessions[session].ws && common.sessions[session].ws.readyState === WebSocket.OPEN) {
@@ -181,5 +181,37 @@ const lib = module.exports = {
                 username: favorite.username
             };
         });
+    },
+
+    /** 
+     * @param {mongodb.ObjectID} selfId
+     * @param {mongodb.ObjectID} userId
+     */
+    getChatHistory: async (selfId, userId) => {
+        const messages = await common.messages.aggregate([
+            {
+                $match: {
+                    $or: [
+                        {
+                            from: selfId,
+                            to: userId
+                        }, {
+                            from: userId,
+                            to: selfId
+                        }
+                    ]
+                }
+            }, {
+                $project: {
+                    from: 1,
+                    content: 1
+                }
+            }, {
+                $limit: 1024
+            }
+        ]).toArray();
+        
+        console.log(messages);
+        return messages;
     }
 };
